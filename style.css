@@ -11,7 +11,7 @@
 body {
   line-height: 1.7em;
   color: #7f8c8d;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 h1,
@@ -165,6 +165,14 @@ a.pure-button-primary {
   margin-right: 7px;
 }
 
+/* This is the class used for the footer */
+.footer {
+  background: #111;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
 /* This is the class used for the dark-background areas. */
 .ribbon {
   background: #2d3e50;
@@ -172,14 +180,6 @@ a.pure-button-primary {
 }
 .ribbon a {
   color: #aaa;
-}
-
-/* This is the class used for the footer */
-.footer {
-  background: #111;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
 }
 
 /*
@@ -238,5 +238,34 @@ a.pure-button-primary {
   /* We increase the header font size even more */
   .splash-head {
     font-size: 300%;
+  }
+}
+
+.article {
+  color: #495051;
+}
+
+.article .content,
+.article .title {
+  max-width: 800px;
+  margin: 10px auto 10px auto;
+}
+
+.article .title {
+  font-size: 3em;
+  line-height: 1em;
+  margin-top: 30px;
+  padding: 1em 10px;
+  text-align: center;
+}
+
+.footer {
+  padding: 0 1em;
+}
+
+@media (max-width: 78em)
+{
+  .article .title {
+    font-size: 2em;
   }
 }
