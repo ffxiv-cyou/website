@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@2.1.0/build/pure-min.css"
+    integrity="sha384-yHIFVG6ClnONEA5yB5DJXfW2/KC173DIQrYoZMEtBvGzmf0PKiGyNEqe9N6BNDBH" crossorigin="anonymous">
+  
+  <title>潜艇收益悬浮窗使用说明</title>
+  <link rel="stylesheet" href="/assets/style.4d2cbdb5.css">
+</head>
+
+<body>
+  <div class="article">
+    <div class="title">
+      潜艇收益悬浮窗使用说明
+    </div>
+    <div class="content">
+      <h2>基础使用方法</h2>
+      <ol>
+        <li>在悬浮窗中添加数据统计，地址填写 https://submarine.ffxiv.cyou/ </li>
+        <li>收艇时会自动统计各艇的收益，以及当前总收益。</li>
+      </ol>
+      <p>本悬浮窗还支持基于金山文档的自动上报统计功能，如有需要可以参考下述配置：</p>
+      <h2>自动上报配置</h2>
+      <h3>ACT插件</h3>
+      <p>由于浏览器跨域限制，悬浮窗无法直接通过网页内部能力实现数据上报。为此，我们提供了一个 ACT 插件，可以绕过浏览器的跨域限制实现上报。</p>
+      <p>请下载<a href="https://github.com/Lotlab/ffxiv-overlay-toolkit/releases" target="_blank">OverlayToolkit</a>，并在 ACT 中添加此插件。此插件不需要做任何配置，添加完毕后即可使用。</p>
+      <h3>金山文档配置</h3>
+      <ol>
+        <li>访问<a href="https://www.kdocs.cn/latest" target="_blank">金山文档</a>，点击左上角的“新建”按钮，选择“多维表”</li>
+        <li>在新建的多维表中，点击左上角的字段管理，修改字段为下面的值。（括号内是字段类型）</li>
+        <ul>
+          <li>潜艇名（文本）</li>
+          <li>物品名（文本）</li>
+          <li>数量（数字）</li>
+          <li>单价（数字）</li>
+          <li>总价（数字）</li>
+          <li>时间（日期）</li>
+        </ul>
+        <li>点击右上角的“脚本”按钮，选择“AirScript脚本”-“新建脚本”</li>
+        <li>在脚本编辑器中，粘贴下面提供的代码。注意如果编辑器中已经有示例代码了，请直接删除原有内容使用下面的代码替换。</li>
+        <li>点击左边脚本列表中当前脚本的“...”按钮，选择“复制脚本Webhook”，得到一个链接地址</li>
+        <li>点击悬浮窗的设置按钮，将这个链接地址填入Webhook设置中</li>
+        <li>在脚本编辑器中，点击编辑器上方工具栏最后一个“脚本令牌”按钮，复制得到你的脚本令牌</li>
+        <li>在悬浮窗的设置中，将脚本令牌填入凭证设置中</li>
+        <li>点击悬浮窗的“测试配置”按钮，查看是否正常写入配置。</li>
+      </ol>
+      <p>脚本代码：</p>
+      <pre>
+function createRecords(array) {
+  const sheet = Application.Selection.GetActiveSheet()
+  const records = Application.Record.CreateRecords({
+      SheetId: sheet.sheetId,
+      Records: array
+  })
+}
+createRecords(Context.argv.data)
+      </pre>
+    </div>
+  </div>
+  <div class="ribbon footer">
+    <p>&copy; 2021-2025 <a href="https://ffxiv.cyou">狒狒西柚</a> | <a href="https://github.com/ffxiv-cyou">Github</a></p>
+  </div>
+</body>
+
+</html>
