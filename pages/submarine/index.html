@@ -22,6 +22,13 @@
         <li>收艇时会自动统计各艇的收益，以及当前总收益。</li>
       </ol>
       <p>本悬浮窗还支持基于金山文档的自动上报统计功能，如有需要可以参考下述配置：</p>
+      <h2>配置项说明</h2>
+      <ul>
+        <li><strong>Webhook</strong>：Webhook地址（详见下文）</li>
+        <li><strong>凭证</strong>：用于上报数据的凭证（详见下文）</li>
+        <li><strong>数据版本</strong>：简要版本只包含首饰收益数据，详细版本包含探索情况和点位信息。详细版本需要使用ACT插件支持，同时需要更新下方的脚本到最新版本。</li>
+        <li><strong>上报分析数据</strong>：匿名上报每个点的收获信息给狒狒西柚，用于数据分析。</li>
+      </ul>
       <h2>自动上报配置</h2>
       <h3>ACT插件</h3>
       <p>由于浏览器跨域限制，悬浮窗无法直接通过网页内部能力实现数据上报。为此，我们提供了一个 ACT 插件，可以绕过浏览器的跨域限制实现上报。</p>
@@ -32,11 +39,6 @@
         <li>在新建的多维表中，点击左上角的字段管理，修改字段为下面的值。（括号内是字段类型）</li>
         <ul>
           <li>潜艇名（文本）</li>
-          <li>物品名（文本）</li>
-          <li>数量（数字）</li>
-          <li>单价（数字）</li>
-          <li>总价（数字）</li>
-          <li>时间（日期）</li>
         </ul>
         <li>点击右上角的“脚本”按钮，选择“AirScript脚本”-“新建脚本”</li>
         <li>在脚本编辑器中，粘贴下面提供的代码。注意如果编辑器中已经有示例代码了，请直接删除原有内容使用下面的代码替换。</li>
@@ -49,15 +51,63 @@
       <p>脚本代码：</p>
       <pre>
 function createRecords(array) {
+  if (array.length === 0) return;
+  
   const sheet = Application.Selection.GetActiveSheet()
-  const records = Application.Record.CreateRecords({
-      SheetId: sheet.sheetId,
-      Records: array
+  const fields = Array.from(Application.Field.GetFields(sheet.sheetId));
+  const dataFields = array[0].fields;
+  const keys = Object.keys(dataFields);
+  const createFields = [];
+  for (let i = 0; i < keys.length; i++) {
+    if (fields.findIndex(x => x.name === keys[i]) >= 0)
+      continue;
+    const typ = typeof dataFields[keys[i]];
+    switch (typ) {
+      case "string":
+        const dateMatch = /[0-9]{4}\/[0-9]{2}\/[0-9]{2}( [0-9:]+)?/
+        if (dateMatch.test(val)) 
+          createFields.push({name: keys[i], type: "Date"});
+        else
+          createFields.push({name: keys[i], type: "MultiLineText"});
+        break;
+      case "number":
+        createFields.push({name: keys[i], type: "Number"});
+        break;
+      case "boolean":
+        createFields.push({name: keys[i], type: "Checkbox"});
+        break;
+      default:
+        console.log("failed to get field type", keys[i], typ);
+        break;
+    }
+  }
+  if (createFields.length > 0) {
+    console.log("create fields", createFields);
+    Application.Field.CreateFields({SheetId: sheet.sheetId, Fields: createFields});
+  }
+
+  Application.Record.CreateRecords({
+    SheetId: sheet.sheetId,
+    Records: array
   })
 }
 createRecords(Context.argv.data)
       </pre>
-    </div>
+      <h2>隐私政策</h2>
+      <p>只有在您主动开启“上报分析数据”功能时，相关数据才会上传至我们的服务器。未开启该功能时，您的任何数据都不会被收集或上传。</p>
+      <p>我们可能收集的信息包括：</p>
+      <ul>
+        <li>潜艇的组件、等级、路线等配置信息</li>
+        <li>潜艇探索结果：点位、物品、数量、品质、评价等</li>
+        <li>网络访问日志：IP地址、访问时间、悬浮窗UA（仅用于安全和统计分析）</li>
+      </ul>
+      <p>我们不会收集任何可用于识别您游戏账号或个人身份的信息。我们通过潜艇的注册时间和本次探索归还时间生成匿名标识，仅用于数据去重，该标识无法反向还原您的潜艇或个人信息。</p>
+      <p>数据用途说明：</p>
+      <ul>
+        <li>用于生成匿名化的潜艇探索统计，帮助优化点位收益分析</li>
+        <li>与其他用户数据汇总，形成整体统计报告和趋势分析</li>
+        <li>除非法律法规要求，否则不会将数据用于其他目的或与第三方共享</li>
+      </ul>
   </div>
   <div class="ribbon footer">
     <p>&copy; 2021-2025 <a href="https://ffxiv.cyou">狒狒西柚</a> | <a href="https://github.com/ffxiv-cyou">Github</a></p>
